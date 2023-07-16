@@ -196,4 +196,4 @@ Updates the details of a student in the `student` table based on the `studentId`
 
 Deletes a student from the `student` table based on the `studentId`. 
 
-**Do not modify the code in `SchoolApplication.java`**
+**Do not modify the code in `SchoolApplication.java`**# new
