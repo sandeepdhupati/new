@@ -1,57 +1,55 @@
 package com.example.school.controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import java.util.*;
+
+import com.example.school.model.Student;
+import com.example.school.service.StudentH2Service;
+
+
+
 
 @RestController
 @RequestMapping("/students")
 public class StudentController {
-    private final StudentH2Service studentService;
-    
+
     @Autowired
-    public StudentController(StudentH2Service studentService) {
-        this.studentService = studentService;
-    }
-    
+    private StudentRepository studentRepository;
+
     @GetMapping
-    public ArrayList<Student> getAllStudents() {
-        return studentService.getAllStudents();
+    public List<Student> getAllStudents() {
+        return studentRepository.getAllStudents();
     }
-    
+
     @PostMapping
-    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        Student addedStudent = studentService.addStudent(student);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedStudent);
+    public Student addStudent(@RequestBody Student student) {
+        return studentRepository.addStudent(student);
     }
-    
+
     @PostMapping("/bulk")
-    public String addStudents(@RequestBody ArrayList<Student> students) {
-        int numAdded = studentService.addStudents(students);
-        return "Added " + numAdded + " students.";
+    public String addMultipleStudents(@RequestBody List<Student> students) {
+        int addedCount = studentRepository.addMultipleStudents(students);
+        return addedCount + " students added.";
     }
-    
+
     @GetMapping("/{studentId}")
-    public ResponseEntity<Student> getStudentById(@PathVariable int studentId) {
-        Student student = studentService.getStudentById(studentId);
+    public Student getStudentById(@PathVariable int studentId) {
+        Student student = studentRepository.getStudentById(studentId);
         if (student == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found");
         }
-        return ResponseEntity.ok(student);
+        return student;
     }
-    
+
     @PutMapping("/{studentId}")
-    public ResponseEntity<Student> updateStudent(@PathVariable int studentId, @RequestBody Student student) {
+    public Student updateStudent(@PathVariable int studentId, @RequestBody Student student) {
         student.setStudentId(studentId);
-        studentService.updateStudent(student);
-        return ResponseEntity.ok(student);
+        return studentRepository.updateStudent(student);
     }
-    
+
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable int studentId) {
-        studentService.deleteStudent(studentId);
-        return ResponseEntity.noContent().build();
+    public void deleteStudent(@PathVariable int studentId) {
+        studentRepository.deleteStudent(studentId);
     }
 }
