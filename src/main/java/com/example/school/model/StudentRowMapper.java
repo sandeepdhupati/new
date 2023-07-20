@@ -1,4 +1,4 @@
-package com.example.school.model;1
+package com.example.school.model;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

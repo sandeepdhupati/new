@@ -1,33 +1,86 @@
-import java.util.List;
+package com.example.school.service;
 
-public class StudentH2Service {
-    private final StudentRepository studentRepository;
-    
-    public StudentH2Service(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+
+import com.example.school.model.Student;
+import com.example.school.model.StudentRowMapper;
+import com.example.school.repository.StudentRepository;
+
+
+import java.util.ArrayList;
+
+
+@Service
+public class StudentH2Service implements StudentRepository {
+
+
+    @Autowired
+    private JdbcTemplate db;
+
+
+    @Override
+    public ArrayList<Student> getStudents() {
+        return (ArrayList<Student>) db.query("select * from student", new StudentRowMapper());
     }
-    
-    public List<Student> getAllStudents() {
-        return studentRepository.getAllStudents();
-    }
-    
+
+
+    @Override
     public Student getStudentById(int studentId) {
-        return studentRepository.getStudentById(studentId);
+        try {
+            return db.queryForObject("select * from student where studentId = ?", new StudentRowMapper(), studentId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
-    
-    public Student addStudent(Student student) {
-        return studentRepository.addStudent(student);
+
+
+    @Override
+    public Student addSingleStudent(Student student) {
+        db.update("insert into student(studentName,gender,standard) values (?,?,?)", student.getStudentName(),
+                student.getGender(), student.getStandard());
+        return db.queryForObject("select * from student where studentName = ? and gender = ? and standard = ?",
+                new StudentRowMapper(), student.getStudentName(), student.getGender(), student.getStandard());
     }
-    
-    public int addStudents(List<Student> students) {
-        return studentRepository.addStudents(students);
+
+
+    @Override
+    public String addMultipleStudents(ArrayList<Student> studentsList) {
+        for (Student eachStudent : studentsList) {
+            db.update("insert into student(studentName,gender,standard) values (?,?,?)", eachStudent.getStudentName(),
+                    eachStudent.getGender(), eachStudent.getStandard());
+        }
+
+
+        String responseMessage = String.format("Successfully added %d students", studentsList.size());
+
+
+        return responseMessage;
     }
-    
-    public void updateStudent(Student student) {
-        studentRepository.updateStudent(student);
+
+
+    @Override
+    public Student updateStudent(int studentId, Student student) {
+        if (student.getStudentName() != null) {
+            db.update("update student set studentName = ? where studentId = ?", student.getStudentName(), studentId);
+        }
+        if (student.getGender() != null) {
+            db.update("update student set gender = ? where studentId = ?", student.getGender(), studentId);
+        }
+        if (student.getStandard() != 0) {
+            db.update("update student set standard = ? where studentId = ?", student.getStandard(), studentId);
+        }
+        return getStudentById(studentId);
     }
-    
+
+
+    @Override
     public void deleteStudent(int studentId) {
-        studentRepository.deleteStudent(studentId);
+        db.update("delete from student where studentId = ?", studentId);
     }
 }
