@@ -1,3 +1,5 @@
+package com.example.school.model;
+
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -14,4 +16,5 @@ public class StudentRowMapper implements RowMapper<Student> {
         return student;
     }
 }
+
 

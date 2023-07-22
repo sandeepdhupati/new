@@ -1,13 +1,14 @@
 package com.example.school.repository;
-import java.util.*;
-import com.example.student.model.Student;
 
-public interface StudentRepository{
-    
+import com.example.school.model.Student;
+
+import java.util.ArrayList;
+
+public interface StudentRepository {
     ArrayList<Student> getStudents();
-    Student addStudent(Student student);
-    int addMultipleStudents(List<Student> students);
     Student getStudentById(int studentId);
-    Student updateStudent(Student student);
+    Student addSingleStudent(Student student);
+    String addMultipleStudents(ArrayList<Student> studentsList);
+    Student updateStudent(int studentId, Student student);
     void deleteStudent(int studentId);
 }
